@@ -1,0 +1,57 @@
+---
+description: my-agent-web 项目上下文与开发约定
+alwaysApply: true
+---
+
+# my-agent-web 项目上下文
+
+## 项目定位
+
+- 仓库：`my-agent-web`
+- 类型：**Agent / 对话类 Web 前端**（后续会接 API、流式响应等）
+- 需求、接口形态、产品行为不明确时：**先向用户提问，不要臆造**
+
+## 技术栈（仅使用已引入依赖）
+
+| 领域 | 选型 |
+|------|------|
+| 运行时 | React 19 + TypeScript ~6 |
+| 构建 | Vite 8 + `@vitejs/plugin-react` |
+| 编译优化 | React Compiler（`vite.config.ts` 中 `babel` + `reactCompilerPreset`） |
+| 路由 | React Router 7（`src/router/index.tsx` + `RouterProvider`） |
+| 客户端状态 | Zustand（`src/store/useXxxStore.ts`） |
+| 服务端状态 | `@tanstack/react-query` **已安装但未接入**（`main.tsx` 尚无 `QueryClientProvider`） |
+| UI | shadcn/ui（`radix-nova`，见 `components.json`） |
+| 样式 | Tailwind CSS 4 + `tw-animate-css` + Geist Variable（`src/index.css`） |
+| 工具 | `cn()`（`src/lib/utils.ts`）、CVA、`lucide-react` |
+| 包管理 | **pnpm**（脚本与 CLI 优先 `pnpm` / `pnpm dlx`） |
+| 质量 | ESLint + Prettier（改完可跑 `pnpm lint`） |
+
+## 目录约定
+
+- 路径别名：`@/*` → `src/*`
+- 页面：`src/pages/<name>/index.tsx`
+- 路由：在 `src/router/index.tsx` 集中注册
+- 全局 store：`src/store/useXxxStore.ts`，Zustand `create` + TypeScript interface
+- UI：`@/components/ui/*`；缺组件时用 `pnpm dlx shadcn@latest add <name>`，勿重复手写 primitives
+- 入口：`main.tsx` → `App.tsx` → `RouterProvider`
+
+## 样式与组件
+
+- 使用语义 token（`bg-primary`、`text-muted-foreground`），避免随意硬编码色（如 `text-red-500`）
+- 条件 class 用 `cn()`，不用冗长模板字符串
+- UI 细节可参考 `.agents/skills/shadcn/SKILL.md`；已配置 `.cursor/mcp.json` 的 shadcn MCP
+
+## API / 数据层（首次接入时）
+
+- 在 `main.tsx` 包裹 `QueryClientProvider`
+- 请求逻辑放 `src/api/` 或 `src/services/`（新建前与用户确认目录名）
+- 页面用 `useQuery` / `useMutation`；跨页面 UI 状态仍用 Zustand
+- 流式 / SSE：实现前**必须问用户**后端协议与端点
+
+## Agent 行为
+
+- **默认使用简体中文**回复与注释（代码标识符用英文）
+- 只改任务相关文件；不做无关重构；不擅自新增依赖（先说明理由并征得同意）
+- 常用命令：`pnpm dev`、`pnpm build`、`pnpm lint`
+- **信息不足、有多种架构取舍或不懂时：用中文向用户提问**，不要猜测
