@@ -1,9 +1,10 @@
 import { useCallback, useRef, useState } from 'react';
 import { streamAgentChat } from '@/api/modules/agent';
 import { getErrorMessage } from '@/api/utils';
+import { extractAgentTextDelta } from '@/lib/parseAgentStream';
 
 export function useAgentStream() {
-  const [chunks, setChunks] = useState<string[]>([]);
+  const [reply, setReply] = useState('');
   const [isStreaming, setIsStreaming] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const abortRef = useRef<AbortController | null>(null);
@@ -13,7 +14,7 @@ export function useAgentStream() {
     const controller = new AbortController();
     abortRef.current = controller;
 
-    setChunks([]);
+    setReply('');
     setError(null);
     setIsStreaming(true);
 
@@ -22,7 +23,10 @@ export function useAgentStream() {
         message,
         signal: controller.signal,
         onChunk: (data) => {
-          setChunks((prev) => [...prev, data]);
+          const delta = extractAgentTextDelta(data);
+          if (delta) {
+            setReply((prev) => prev + delta);
+          }
         },
       });
     } catch (err) {
@@ -39,5 +43,5 @@ export function useAgentStream() {
     setIsStreaming(false);
   }, []);
 
-  return { chunks, isStreaming, error, send, cancel };
+  return { reply, isStreaming, error, send, cancel };
 }
