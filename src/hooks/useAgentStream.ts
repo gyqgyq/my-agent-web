@@ -9,7 +9,7 @@ export function useAgentStream() {
   const [error, setError] = useState<string | null>(null);
   const abortRef = useRef<AbortController | null>(null);
 
-  const send = useCallback(async (message: string) => {
+  const send = useCallback(async (message: string, workId: number) => {
     abortRef.current?.abort();
     const controller = new AbortController();
     abortRef.current = controller;
@@ -21,6 +21,7 @@ export function useAgentStream() {
     try {
       await streamAgentChat({
         message,
+        workId,
         signal: controller.signal,
         onChunk: (data) => {
           const delta = extractAgentTextDelta(data);

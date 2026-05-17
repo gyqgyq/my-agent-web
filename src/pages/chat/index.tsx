@@ -1,58 +1,110 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
+import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { useAgentStream } from '@/hooks/useAgentStream';
-import { useLogoutMutation } from '@/hooks/useAccount';
+import { useWorksQuery } from '@/hooks/useWorks';
+import { useWorkStore } from '@/store/useWorkStore';
 import { cn } from '@/lib/utils';
 
 export default function ChatPage() {
   const [message, setMessage] = useState('');
   const { reply, isStreaming, error, send, cancel } = useAgentStream();
-  const logoutMutation = useLogoutMutation();
+  const { data: works, isLoading: worksLoading } = useWorksQuery();
+  const activeWorkId = useWorkStore((s) => s.activeWorkId);
+  const setActiveWorkId = useWorkStore((s) => s.setActiveWorkId);
+  const clearActiveWork = useWorkStore((s) => s.clearActiveWork);
+
+  useEffect(() => {
+    if (!works || works.length === 0) {
+      clearActiveWork();
+      return;
+    }
+    if (
+      activeWorkId !== null &&
+      !works.some((w) => w.id === activeWorkId)
+    ) {
+      clearActiveWork();
+    }
+  }, [works, activeWorkId, clearActiveWork]);
 
   const handleSend = () => {
     const text = message.trim();
-    if (!text || isStreaming) return;
-    void send(text);
+    if (!text || isStreaming || activeWorkId === null) return;
+    void send(text, activeWorkId);
   };
 
   const showReply = reply.length > 0 || isStreaming;
+  const hasWorks = (works?.length ?? 0) > 0;
+  const canSend = hasWorks && activeWorkId !== null && !isStreaming;
 
   return (
-    <div className="mx-auto flex max-h-svh max-w-2xl flex-col gap-4 p-6">
-      <header className="flex shrink-0 items-center justify-between">
-        <h1 className="text-2xl font-semibold">Agent 对话</h1>
-        <div className="flex gap-2">
-          <Button variant="outline" asChild>
-            <Link to="/">首页</Link>
-          </Button>
-          <Button
-            variant="outline"
-            onClick={() => logoutMutation.mutate()}
-            disabled={logoutMutation.isPending}
-          >
-            退出
+    <div className="mx-auto flex max-h-[calc(100svh-3rem)] max-w-2xl flex-col gap-4 p-6">
+      <h1 className="text-2xl font-semibold">Agent 对话</h1>
+
+      {worksLoading && (
+        <p className="text-sm text-muted-foreground">加载作品列表…</p>
+      )}
+
+      {!worksLoading && !hasWorks && (
+        <div className="rounded-md border border-dashed border-border p-4 text-sm">
+          <p className="text-muted-foreground">暂无作品，请先创建并上传文档。</p>
+          <Button className="mt-3" size="sm" asChild>
+            <Link to="/works">前往作品管理</Link>
           </Button>
         </div>
-      </header>
+      )}
+
+      {hasWorks && (
+        <div className="flex flex-col gap-2">
+          <Label htmlFor="work-select">当前作品</Label>
+          <Select
+            value={activeWorkId !== null ? String(activeWorkId) : undefined}
+            onValueChange={(v) => setActiveWorkId(Number(v))}
+          >
+            <SelectTrigger id="work-select" className="w-full">
+              <SelectValue placeholder="请选择作品" />
+            </SelectTrigger>
+            <SelectContent>
+              {works?.map((w) => (
+                <SelectItem key={w.id} value={String(w.id)}>
+                  {w.title}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      )}
 
       <textarea
         value={message}
         onChange={(e) => setMessage(e.target.value)}
         placeholder="输入消息…"
         rows={3}
-        disabled={isStreaming}
+        disabled={isStreaming || !hasWorks}
         className="shrink-0 rounded-md border border-input bg-background px-3 py-2 text-sm disabled:opacity-60"
       />
 
-      <div className="flex shrink-0 gap-2">
-        <Button onClick={handleSend} disabled={isStreaming || !message.trim()}>
-          {isStreaming ? '生成中…' : '发送'}
-        </Button>
-        {isStreaming && (
-          <Button variant="outline" onClick={cancel}>
-            取消
+      <div className="flex shrink-0 flex-col gap-2">
+        <div className="flex gap-2">
+          <Button onClick={handleSend} disabled={!canSend || !message.trim()}>
+            {isStreaming ? '生成中…' : '发送'}
           </Button>
+          {isStreaming && (
+            <Button variant="outline" onClick={cancel}>
+              取消
+            </Button>
+          )}
+        </div>
+        {hasWorks && activeWorkId === null && (
+          <p className="text-sm text-muted-foreground">请先选择作品</p>
         )}
       </div>
 
@@ -76,7 +128,7 @@ export default function ChatPage() {
               {reply}
               {isStreaming && (
                 <span
-                  className="ml-0.5 inline-block w-2 animate-pulse bg-foreground align-middle"
+                  className="ml-0.5 inline-block h-4 w-0.5 animate-pulse bg-foreground align-middle"
                   aria-hidden
                 />
               )}

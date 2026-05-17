@@ -56,3 +56,32 @@ export interface FastAPIValidationError {
 export interface FastAPIErrorBody {
   detail?: string | FastAPIValidationError[];
 }
+
+export interface WorkOut {
+  id: number;
+  title: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface WorkCreate {
+  title: string;
+}
+
+export interface WorkUpdate {
+  title: string;
+}
+
+export type DocumentStatus = 'pending' | 'done' | 'failed';
+
+export interface DocumentOut {
+  id: number;
+  work_id: number;
+  filename: string;
+  content_type: string;
+  size_bytes: number;
+  status: DocumentStatus;
+  chunk_count: number;
+  error_message: string | null;
+  created_at: string;
+}

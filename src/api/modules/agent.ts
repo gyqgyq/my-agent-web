@@ -10,16 +10,19 @@ import { getAccessToken } from '@/store/useAuthStore';
 
 export interface AgentStreamBody {
   message: string;
+  work_id: number;
 }
 
 export interface AgentStreamOptions {
   message: string;
+  workId: number;
   signal?: AbortSignal;
   onChunk: (data: string) => void;
 }
 
 async function fetchStreamResponse(
   message: string,
+  workId: number,
   signal?: AbortSignal,
 ): Promise<Response> {
   const base = getBaseURL();
@@ -32,7 +35,10 @@ async function fetchStreamResponse(
       'Content-Type': 'application/json',
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
     },
-    body: JSON.stringify({ message } satisfies AgentStreamBody),
+    body: JSON.stringify({
+      message,
+      work_id: workId,
+    } satisfies AgentStreamBody),
     signal,
   });
 }
@@ -63,12 +69,13 @@ function handleSSELine(line: string, onChunk: (data: string) => void): 'done' | 
 
 export async function streamAgentChat({
   message,
+  workId,
   signal,
   onChunk,
 }: AgentStreamOptions): Promise<void> {
   await ensureValidAccessToken();
 
-  let response = await fetchStreamResponse(message, signal);
+  let response = await fetchStreamResponse(message, workId, signal);
 
   if (response.status === 401) {
     const refreshed = await tryRefreshAccessToken();
@@ -76,7 +83,7 @@ export async function streamAgentChat({
       handleUnauthorized();
       throw new ApiError('未授权，请重新登录', 401);
     }
-    response = await fetchStreamResponse(message, signal);
+    response = await fetchStreamResponse(message, workId, signal);
   }
 
   if (!response.ok) {
