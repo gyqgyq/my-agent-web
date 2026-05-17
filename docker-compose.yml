@@ -1,0 +1,18 @@
+# 本地/腾讯云单机试跑示例：前端 + 需自行提供后端地址
+# 全栈同机：先启动 my-agent-sever，再将 API_UPSTREAM 指到宿主机或 compose 服务名
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        # 与后端同域反代：留空
+        VITE_API_BASE_URL: ""
+    image: my-agent-web:latest
+    ports:
+      - "8080:80"
+    environment:
+      # Linux 宿主机上的后端（Docker Desktop 可用 host.docker.internal）
+      API_UPSTREAM: ${API_UPSTREAM:-http://host.docker.internal:8000}
+    restart: unless-stopped

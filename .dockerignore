@@ -1,0 +1,16 @@
+node_modules
+dist
+dist-ssr
+.git
+.gitignore
+.env.development
+.env.local
+*.log
+.vscode
+.idea
+.DS_Store
+.agents
+.cursor
+coverage
+*.md
+!DEPLOY.md
