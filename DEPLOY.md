@@ -23,7 +23,7 @@ docker run --rm -p 8080:80 \
 API_UPSTREAM=http://host.docker.internal:8000 docker compose up --build
 ```
 
-浏览器访问：`http://localhost:8080`
+浏览器访问：`http://localhost:8000`
 
 ## 2. 两种 API 对接方式
 

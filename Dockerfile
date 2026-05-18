@@ -14,7 +14,7 @@ RUN pnpm install --frozen-lockfile
 COPY . .
 
 # 留空则走同源 /api + Nginx 反代；默认直连生产后端
-ARG VITE_API_BASE_URL=http://43.143.219.22:8080
+ARG VITE_API_BASE_URL=https://43.143.219.22:8000
 ENV VITE_API_BASE_URL=${VITE_API_BASE_URL}
 
 RUN pnpm build
@@ -23,7 +23,7 @@ RUN pnpm build
 FROM nginx:1.27-alpine
 
 # 反代目标（须含协议，无尾斜杠），例：http://my-agent-api:8000
-ENV API_UPSTREAM=http://43.143.219.22:8080
+ENV API_UPSTREAM=https://43.143.219.22:8000
 
 COPY nginx/default.conf.template /etc/nginx/templates/default.conf.template
 COPY --from=builder /app/dist /usr/share/nginx/html
