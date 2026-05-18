@@ -7,12 +7,11 @@ services:
       context: .
       dockerfile: Dockerfile
       args:
-        # 与后端同域反代：留空
-        VITE_API_BASE_URL: ""
+        VITE_API_BASE_URL: ${VITE_API_BASE_URL:-http://43.143.219.22:8080}
     image: my-agent-web:latest
     ports:
       - "8080:80"
     environment:
-      # Linux 宿主机上的后端（Docker Desktop 可用 host.docker.internal）
-      API_UPSTREAM: ${API_UPSTREAM:-http://host.docker.internal:8000}
+      # 仅 VITE_API_BASE_URL 留空、走 Nginx 同源反代时生效
+      API_UPSTREAM: ${API_UPSTREAM:-http://43.143.219.22:8080}
     restart: unless-stopped
