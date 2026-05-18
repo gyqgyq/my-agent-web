@@ -7,11 +7,11 @@ services:
       context: .
       dockerfile: Dockerfile
       args:
-        VITE_API_BASE_URL: ${VITE_API_BASE_URL:-https://api.gyq.asia}
+        VITE_API_BASE_URL: ${VITE_API_BASE_URL:-https://api.gyq.asia:8443}
     image: my-agent-web:latest
     ports:
       - "8001:80"
     environment:
       # 仅 VITE_API_BASE_URL 留空、走 Nginx 同源反代时生效
-      API_UPSTREAM: ${API_UPSTREAM:-https://api.gyq.asia}
+      API_UPSTREAM: ${API_UPSTREAM:-https://api.gyq.asia:8443}
     restart: unless-stopped
