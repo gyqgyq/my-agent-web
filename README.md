@@ -92,10 +92,10 @@ proxy: { '/api': { target: 'http://localhost:8000', changeOrigin: true } }
 
 | 方式 | `VITE_API_BASE_URL`（构建时） | `API_UPSTREAM`（容器运行时） | 说明 |
 |------|-------------------------------|------------------------------|------|
-| **跨域直连** | `https://43.143.219.22:8000` | 不依赖 | 浏览器直接请求后端，需配置 CORS |
+| **跨域直连** | `https://api.gyq.asia` | 不依赖 | 浏览器直接请求后端，需配置 CORS |
 | **同源反代** | 留空 | `http://<后端地址>` | 由 Nginx 将 `/api` 转发到后端 |
 
-当前仓库默认生产后端：`https://43.143.219.22:8000`（见 `.env.production`、`.env.production.example`）。
+当前仓库默认生产后端：`https://api.gyq.asia`（见 `.env.production`、`.env.production.example`）。
 
 > `VITE_*` 在 **构建时** 写入静态资源；`API_UPSTREAM` 仅在「留空 `VITE_API_BASE_URL` + Docker/Nginx」时生效。
 
