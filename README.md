@@ -112,7 +112,7 @@ docker run -d \
   my-agent-web:latest
 ```
 
-浏览器访问：**http://localhost:8000**
+本地试跑访问：**http://localhost:8001**（生产由 nginx-ssl 提供 **https://gyq.asia**）
 
 ### Docker Compose
 

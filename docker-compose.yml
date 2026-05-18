@@ -10,7 +10,7 @@ services:
         VITE_API_BASE_URL: ${VITE_API_BASE_URL:-https://api.gyq.asia}
     image: my-agent-web:latest
     ports:
-      - "8080:80"
+      - "8001:80"
     environment:
       # 仅 VITE_API_BASE_URL 留空、走 Nginx 同源反代时生效
       API_UPSTREAM: ${API_UPSTREAM:-https://api.gyq.asia}
