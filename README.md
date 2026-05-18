@@ -109,6 +109,7 @@ docker build -t my-agent-web:latest .
 docker run -d \
   --name my-agent-web \
   -p 8001:80 \
+  --restart unless-stopped \
   my-agent-web:latest
 ```
 
