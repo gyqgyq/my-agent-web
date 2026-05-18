@@ -110,6 +110,7 @@ docker run -d \
   --name my-agent-web \
   -p 8001:80 \
   --restart unless-stopped \
+  --network my-agent-network \
   my-agent-web:latest
 ```
 
