@@ -18,7 +18,7 @@ docker build -t my-agent-web:latest .
 docker build -t my-agent-web:latest \
   --build-arg VITE_API_BASE_URL=https://api.example.com .
 
-docker run --rm -p 8080:80 my-agent-web:latest
+docker run -d   --name my-agent-web   -p 8001:80   --restart unless-stopped --network my-agent-network  my-agent-web:latest
 
 # 或使用 compose
 docker compose up --build
