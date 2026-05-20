@@ -12,6 +12,7 @@ import {
 import { useAgentStream } from '@/hooks/useAgentStream';
 import { useWorksQuery } from '@/hooks/useWorks';
 import { useWorkStore } from '@/store/useWorkStore';
+import { MarkdownContent } from '@/components/MarkdownContent';
 import { cn } from '@/lib/utils';
 
 export default function ChatPage() {
@@ -124,15 +125,15 @@ export default function ChatPage() {
             <p className="text-sm text-muted-foreground">发送消息后在此显示</p>
           )}
           {showReply && (
-            <p className="text-sm leading-relaxed whitespace-pre-wrap">
-              {reply}
+            <div className="text-sm leading-relaxed">
+              {reply.length > 0 && <MarkdownContent>{reply}</MarkdownContent>}
               {isStreaming && (
                 <span
                   className="ml-0.5 inline-block h-4 w-0.5 animate-pulse bg-foreground align-middle"
                   aria-hidden
                 />
               )}
-            </p>
+            </div>
           )}
         </div>
       </div>
