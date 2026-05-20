@@ -1,5 +1,4 @@
-# 本地/腾讯云单机试跑示例：前端 + 需自行提供后端地址
-# 全栈同机：先启动 my-agent-sever，再将 API_UPSTREAM 指到宿主机或 compose 服务名
+# 本地/腾讯云单机试跑示例：前端静态服务，API 地址在构建时通过 VITE_API_BASE_URL 写入
 
 services:
   web:
@@ -11,7 +10,4 @@ services:
     image: my-agent-web:latest
     ports:
       - "8001:80"
-    environment:
-      # 仅 VITE_API_BASE_URL 留空、走 Nginx 同源反代时生效
-      API_UPSTREAM: ${API_UPSTREAM:-https://api.gyq.asia:8443}
     restart: unless-stopped

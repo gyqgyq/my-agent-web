@@ -88,16 +88,13 @@ pnpm lint     # ESLint
 proxy: { '/api': { target: 'http://localhost:8000', changeOrigin: true } }
 ```
 
-### 生产环境（两种方式）
+### 生产环境
 
-| 方式 | `VITE_API_BASE_URL`（构建时） | `API_UPSTREAM`（容器运行时） | 说明 |
-|------|-------------------------------|------------------------------|------|
-| **跨域直连** | `https://api.gyq.asia:8443` | 不依赖 | 浏览器直接请求后端，需配置 CORS |
-| **同源反代** | 留空 | `http://<后端地址>` | 由 Nginx 将 `/api` 转发到后端 |
+构建时设置 `VITE_API_BASE_URL`（完整 API 地址，勿尾斜杠），浏览器直连后端，需配置 CORS。
 
-当前仓库默认生产后端：`https://api.gyq.asia:8443`（见 `.env.production`、`.env.production.example`）。
+当前仓库默认：`https://api.gyq.asia:8443`（见 `.env.production`、`.env.production.example`）。
 
-> `VITE_*` 在 **构建时** 写入静态资源；`API_UPSTREAM` 仅在「留空 `VITE_API_BASE_URL` + Docker/Nginx」时生效。
+> `VITE_*` 在 **构建时** 写入静态资源，Docker 运行时改环境变量无效。
 
 ## Docker 部署
 
@@ -125,10 +122,7 @@ docker compose up --build
 覆盖 API 地址示例：
 
 ```bash
-VITE_API_BASE_URL=http://your-api:8000 docker compose up --build
-# 或同源反代模式
-docker compose build --build-arg VITE_API_BASE_URL=
-API_UPSTREAM=http://your-api:8000 docker compose up
+VITE_API_BASE_URL=https://api.example.com docker compose up --build
 ```
 
 更完整的腾讯云 / TCR 部署步骤见 **[DEPLOY.md](./DEPLOY.md)**。
@@ -146,7 +140,6 @@ src/
 ├── lib/              # queryClient、工具函数
 ├── App.tsx
 └── main.tsx
-nginx/                # 生产 Nginx 模板（/api 反代）
 Dockerfile
 docker-compose.yml
 ```
